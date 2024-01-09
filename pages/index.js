@@ -69,24 +69,39 @@ function viewAlbum(setImages) {
         return;
     }
 
-    // Filter for PNG files
-    var pngFiles = data.Contents.filter(function(file) {
-        return file.Key.endsWith('.png');
-    });
+    var files = data.Contents.reduce((acc, file) => {
+      if (file.Key.endsWith('.png')) {
+        const jsonKey = file.Key.replace('.png', '.json');
+        acc.push({
+          pngKey: file.Key,
+          jsonKey: jsonKey
+        });
+      }
+      return acc;
+    }, []);
 
     var href = this.request.httpRequest.endpoint.href;
     var bucketUrl = href + bucketName + "/";
 
-    var photos = pngFiles.map(function(photo) {
-        var photoKey = photo.Key;
-        var photoUrl = bucketUrl + encodeURIComponent(photoKey);
-        return {
-            key: photoKey,
-            url: photoUrl
-        };
-    });
+    var photos = files.map(({ pngKey, jsonKey }) => ({
+      imageUrl: bucketUrl + encodeURIComponent(pngKey),
+      jsonUrl: bucketUrl + encodeURIComponent(jsonKey),
+    }));
+
+    console.log("Photos:" + photos);
+
     setImages(photos);
   });
+}
+
+function extractImageNameFromUrl(url) {
+  // Use a regular expression to extract the file name with extension
+  const match = url.match(/([^\/]+\.png)$/); // This regex will match the filename ending with .png
+  if (match) {
+    return match[0];
+  } else {
+    return "No image name found in URL.";
+  }
 }
 
 export default function Login() {
@@ -94,18 +109,103 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   const [images, setImages] = useState([]);
   const [fullImage, setFullImage] = useState(null);
+  const [fullImageJson, setFullImageJson] = useState(null);
+  const [isSignatureModalVisible, setIsSignatureModalVisible] = useState(false);
+  const [imageFilename, setImageFilename] = useState('');
+
   const [errorMessage, setErrorMessage] = useState('');
   const [isFullImageVisible, setIsFullImageVisible] = useState(false);
 
-  const openFullImage = (src) => {
-    setFullImage(src);
+
+  const openFullImage = async (imageData) => {
+    setFullImage(imageData.imageUrl);
+    setImageFilename(extractImageNameFromUrl(imageData.imageUrl));
     setIsFullImageVisible(true);
+
+    try {
+      const response = await fetch(imageData.jsonUrl);
+      const jsonData = await response.json();
+      setFullImageJson(jsonData);
+
+    } catch (error) {
+      console.error("Error fetching JSON data:", error);
+      setFullImageJson(null);
+    }
+
   };
+
   const closeFullImage = () => {
     setFullImage(null);
     setIsFullImageVisible(false);
+  };
+
+const downloadImageAndJson = async (imageKey) => {
+  const s3 = new AWS.S3({
+    apiVersion: '2006-03-01',
+    region: region,
+    credentials: new AWS.CognitoIdentityCredentials({
+      IdentityPoolId: identityPoolId,
+      Logins: {
+        [`cognito-idp.${region}.amazonaws.com/${userPoolId}`]: idToken,
+      },
+    }),
+  });
+
+  const bucketName = 'camera' + globalCameraNumber + "verifiedimages";
+
+  // Helper function to create and trigger a download link
+  const triggerDownload = (url, filename) => {
+    const downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = filename;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  };
+
+  // Get signed URL and download the image
+  const imageParams = {
+    Bucket: bucketName,
+    Key: imageKey,
+  };
+
+  s3.getSignedUrl('getObject', imageParams, (err, imageUrl) => {
+    if (err) {
+      console.error('Error getting signed URL for image:', err);
+      return;
+    }
+    triggerDownload(imageUrl, imageKey);
+  });
+
+  // Get signed URL and download the JSON
+  const jsonKey = imageKey.replace('.png', '.json');
+  const jsonParams = {
+    Bucket: bucketName,
+    Key: jsonKey,
+  };
+
+  setTimeout(() => {
+    s3.getSignedUrl('getObject', jsonParams, (err, jsonUrl) => {
+      if (err) {
+        console.error('Error getting signed URL for JSON:', err);
+        return;
+      }
+      triggerDownload(jsonUrl, jsonKey);
+    });
+
+  }, 3000);
+  
+};
+
+  const openSignatureModal = () => {
+    setIsSignatureModalVisible(true);
+  };
+  
+  const closeSignatureModal = () => {
+    setIsSignatureModalVisible(false);
   };
 
   const handleLogin = async (e) => {
@@ -152,6 +252,11 @@ export default function Login() {
 
     });
 
+  };
+
+  const handleDownloadClick = () => {
+    const imageKey = extractImageNameFromUrl(fullImage); // Implement this function to extract the key from the URL
+    downloadImageAndJson(imageKey);
   };
 
   return (
@@ -202,20 +307,58 @@ export default function Login() {
         <>
           {isFullImageVisible && (
             <div className={`${imageStyles.fullImg} ${isFullImageVisible ? imageStyles.show : ''}`} id="fullImgBox">
-              <img src={fullImage} alt="Full Size" />
+              <div className={imageStyles.imageDetails}>
+                <h3>Image Details: {imageFilename}</h3>
+                <img src={fullImage} alt="Full Size" />
+
+                {fullImageJson && (
+                  <div className={imageStyles.jsonContainer}>
+                      {Object.keys(fullImageJson).map((key) => {
+                        if (key !== 'Signature_Base64') {
+                          return (
+                            <li key={key}>
+                              <strong>{key}:</strong> {fullImageJson[key]}
+                            </li>
+                          );
+                        } else {
+                          return (
+                              <button onClick={openSignatureModal}>View Signature</button>
+                          );
+                        }
+                      })}
+                  </div>
+                )}
+                <div className={imageStyles.buttonContainer}>
+                  <button onClick={handleDownloadClick}>
+                    Download Image and Metadata
+                  </button>
+                </div>
+              </div>
+            <div>
               <span onClick={closeFullImage}>X</span>
+            </div>
+
             </div>
           )}
           <div className={imageStyles.imgGallery}>
             {images.map((image, index) => (
               <img
                 key={index}
-                src={image.url}
-                alt={image.key}
-                onClick={() => openFullImage(image.url)}
+                src={image.imageUrl} // Use imageUrl instead of image.url
+                alt={`Image ${index}`} // Using index as alt text, modify as needed
+                onClick={() => openFullImage(image)} // Pass the entire image object
               />
             ))}
           </div>
+
+          {isSignatureModalVisible && (
+            <div className={imageStyles.signatureModal} onClick={closeSignatureModal}>
+              <div className={imageStyles.signatureModalContent} onClick={e => e.stopPropagation()}>
+                <span className={imageStyles.signatureModalClose} onClick={closeSignatureModal}>&times;</span>
+                <pre>{fullImageJson['Signature_Base64']}</pre>
+              </div>
+            </div>
+          )}
         </>
       )}
     </>

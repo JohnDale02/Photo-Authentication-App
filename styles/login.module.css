@@ -1,6 +1,6 @@
 
 .titleContainer {
-    width: 320px;
+    height: 150px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -9,8 +9,10 @@
     margin-bottom: 20px; /* Adjust as needed */
     padding-bottom: 0px;
 
-    background-color: transparent;
     backdrop-filter: blur(20px);
+    background: url("../public/images/security.jpg");
+    background-position: center; /* Centers the image */
+    background-size: cover; /* Cover ensures the entire container is covered */
     box-shadow: 0 0 10px rgba(0, 0, 0, .2);
     color: white;
 
@@ -105,7 +107,7 @@
 .wrapper .btn {
     width: 100%;
     height: 45px;
-    background: #fff;
+    background-color: #3498db;
     border: none;
     outline: none;
     border-radius: 40px;
@@ -114,6 +116,10 @@
     font-size: 16px;
     color: #333;
     font-weight: 600;
+}
+
+.wrapper .btn:hover {
+    background-color: #2980b9;
 }
 
 .wrapper .registerLink {
