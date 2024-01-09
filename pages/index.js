@@ -69,6 +69,8 @@ function viewAlbum(setImages) {
         return;
     }
 
+    data.Contents.sort((a, b) => b.LastModified - a.LastModified);
+
     var files = data.Contents.reduce((acc, file) => {
       if (file.Key.endsWith('.png')) {
         const jsonKey = file.Key.replace('.png', '.json');
@@ -115,6 +117,8 @@ export default function Login() {
   const [fullImageJson, setFullImageJson] = useState(null);
   const [isSignatureModalVisible, setIsSignatureModalVisible] = useState(false);
   const [imageFilename, setImageFilename] = useState('');
+  const [numColumns, setNumColumns] = useState(3); 
+
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isFullImageVisible, setIsFullImageVisible] = useState(false);
@@ -340,13 +344,29 @@ const downloadImageAndJson = async (imageKey) => {
 
             </div>
           )}
-          <div className={imageStyles.imgGallery}>
+
+        <div className={imageStyles.sliderContainer}>
+            <label htmlFor="column-slider"></label>
+            <input 
+              id="column-slider"
+              type="range" 
+              min="2" 
+              max="15" 
+              value={numColumns} 
+              onChange={(e) => setNumColumns(e.target.value)}
+            />
+          </div>
+          
+          <div 
+            className={imageStyles.imgGallery}
+            style={{ '--num-columns': numColumns }}
+          >
             {images.map((image, index) => (
               <img
                 key={index}
-                src={image.imageUrl} // Use imageUrl instead of image.url
-                alt={`Image ${index}`} // Using index as alt text, modify as needed
-                onClick={() => openFullImage(image)} // Pass the entire image object
+                src={image.imageUrl}
+                alt={`Image ${index}`}
+                onClick={() => openFullImage(image)}
               />
             ))}
           </div>

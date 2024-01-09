@@ -3,8 +3,8 @@
     width: 80%;
     margin: 50px auto;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    grid-gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(calc(100% / var(--num-columns)), 1fr));
+    gap: 10px;
 }
 
 /* Adjust the individual image sizes */
@@ -139,6 +139,55 @@
     background-color: #2980b9;
 }
 
+.sliderContainer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 1); /* Dark background for contrast */
+    padding: 20px;
+    box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.3); /* Shadow for depth effect */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10; /* Ensure it's above other content */
+  }
+  
+  .sliderContainer label {
+    margin-right: 15px;
+    color: #fff; /* White color for the label text */
+    font-size: 16px; /* Larger font size */
+    padding-bottom: 80px;
+  }
+  
+  .sliderContainer input[type="range"] {
+    -webkit-appearance: none; /* Override default appearance */
+    appearance: none;
+    width: 600px; /* Adjust width as needed */
+    height: 10px; /* Set the slider thumb height */
+    background: #ddd; /* Background of the slider track */
+    outline: none; /* Remove the outline */
+    opacity: 0.7; /* Make the track slightly transparent */
+    transition: opacity 0.2s;
+    border-radius: 5px; /* Rounded corners for the slider track */
+  }
+  
+  .sliderContainer input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default appearance */
+    appearance: none;
+    width: 40px; /* Width of the thumb */
+    height: 40px; /* Height of the thumb */
+    background: #3498db; /* Thumb color */
+    cursor: pointer; /* Cursor on hover */
+    border-radius: 50%; /* Rounded corners for the thumb */
+    border: 3px solid #fff; /* White border for the thumb */
+  }
+
+  
+  .sliderContainer input[type="range"]:hover,
+  .sliderContainer input[type="range"]:focus {
+    opacity: 1; /* Full opacity on hover/focus */
+  }
 
 .loader {
     border: 16px solid #f3f3f3;
@@ -214,7 +263,6 @@
 
 @media (max-width: 600px) {
     .imgGallery {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
         margin: 20px auto;
         grid-gap: 5px;
     }

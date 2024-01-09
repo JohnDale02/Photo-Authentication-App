@@ -8,3 +8,7 @@ Known Issues / Functionality Limitations:
 - Camera numbers are not a secure way to associate cameras with users
 - Forgot password route is not setup
 - "Remember me" checkbox not setup
+
+To-Do:
+- Add slider for increased or decreased number of images being viewed at once
+- sorting of images based on date taken
