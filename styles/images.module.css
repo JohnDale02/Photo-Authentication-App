@@ -145,7 +145,7 @@
     left: 0;
     right: 0;
     background: rgba(0, 0, 0, 1); /* Dark background for contrast */
-    padding: 20px;
+    padding: 40px;
     box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.3); /* Shadow for depth effect */
     display: flex;
     justify-content: center;
