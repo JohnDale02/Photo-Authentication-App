@@ -1,16 +1,30 @@
 import { useState, useEffect } from 'react';
 import { viewAlbum } from '../cognito/config';
 
-const useImageGallery = (globalCameraNumber) => {
+const useImageGallery = (cameraNumber) => {
   const [images, setImages] = useState([]);
+  const pollInterval = 3000; // Polling interval in milliseconds (e.g., 3000 for 3 seconds)
 
   useEffect(() => {
-    console.log("Fetching images for camera number:", globalCameraNumber); // Debugging
+    let intervalId;
 
-    if (globalCameraNumber) {
-      viewAlbum(setImages, globalCameraNumber);
+    const fetchImages = () => {
+      if (cameraNumber) {
+        viewAlbum(setImages, cameraNumber);
+      }
+    };
+
+    if (cameraNumber) {
+      fetchImages(); // Initial fetch
+      intervalId = setInterval(fetchImages, pollInterval); // Start polling
     }
-  }, [globalCameraNumber]);
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId); // Clear interval on unmount
+      }
+    };
+  }, [cameraNumber, pollInterval]);
 
   return images;
 };

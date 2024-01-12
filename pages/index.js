@@ -40,7 +40,7 @@ export default function Login() {
     setFullImage(imageData.imageUrl);
     setImageFilename(extractImageNameFromUrl(imageData.imageUrl));
     setIsFullImageVisible(true);
-    setIsFullImageVisible(true);
+
 
     try {
       const response = await fetch(imageData.jsonUrl);

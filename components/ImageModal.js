@@ -32,10 +32,11 @@ const ImageModal = ({ isVisible, image, imageJson, imageFilename, onClose, onDow
             Download Image and Metadata
           </button>
         </div>
-      </div>
-      <div>
+        <div>
         <span onClick={onClose}>X</span>
+        </div>
       </div>
+     
     </div>
   );
 };
