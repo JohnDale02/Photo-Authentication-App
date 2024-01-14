@@ -10,7 +10,6 @@ import { downloadImageAndJson } from '../cognito/config'; // Adjust the path as 
 
 import useAuthentication from '../hooks/useAuthentication';
 import useImageGallery from '../hooks/useImageGallery';
-import extractImageNameFromUrl from '../utils/utils';
 
 import styles from '../styles/login.module.css'; // Import as a module
 
@@ -66,7 +65,7 @@ export default function Login() {
   };
 
   const handleDownloadClick = () => {
-    const imageKey = extractImageNameFromUrl(fullImage); 
+    const imageKey = imageFilename; 
     if (userDetails) {
       downloadImageAndJson(imageKey, userDetails.idToken, userDetails.cameraNumber);
     }

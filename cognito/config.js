@@ -39,6 +39,35 @@ export const getCognitoIdentityCredentials = (idToken) => {
 };
 
 export const viewAlbum = (setImages, globalCameraNumber) => {
+
+// Assume `signedUrlCache` is a module-level variable that does not require state updates
+  let signedUrlCache = {};
+
+  const getSignedUrl = (s3, bucketName, key, isJson = false) => {
+    const currentTime = Date.now();
+    const cacheKey = `${bucketName}/${key}${isJson ? '_json' : ''}`;
+
+    if (signedUrlCache[cacheKey] && signedUrlCache[cacheKey].expiry > currentTime) {
+      // Cache hit, return the cached URL
+      return signedUrlCache[cacheKey].url;
+    } else {
+      // Cache miss, generate a new signed URL
+      const url = s3.getSignedUrl('getObject', {
+        Bucket: bucketName,
+        Key: key,
+        Expires: 60 // URL validity in seconds
+      });
+
+      // Update the cache with the new URL and expiry time
+      signedUrlCache[cacheKey] = {
+        url: url,
+        expiry: currentTime + (60 * 1000) // Add 60 seconds to the current time
+      };
+
+      return url;
+    }
+  };
+
   var bucketName = 'camera' + globalCameraNumber + 'verifiedimages';
 
   var s3 = new AWS.S3({
@@ -67,17 +96,8 @@ export const viewAlbum = (setImages, globalCameraNumber) => {
 
     var photos = files.map(({ pngKey, jsonKey }) => {
       // Generate signed URLs for each image and JSON file
-      const imageUrl = s3.getSignedUrl('getObject', {
-        Bucket: bucketName,
-        Key: pngKey,
-        Expires: 60 // This URL will be valid for 60 seconds
-      });
-
-      const jsonUrl = s3.getSignedUrl('getObject', {
-        Bucket: bucketName,
-        Key: jsonKey,
-        Expires: 60 // This URL will be valid for 60 seconds
-      });
+      const imageUrl = getSignedUrl(s3, bucketName, pngKey );
+      const jsonUrl = getSignedUrl(s3, bucketName, jsonKey, true);
 
       return {
         imageUrl: imageUrl,
