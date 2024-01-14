@@ -38,7 +38,7 @@ export default function Login() {
 
   const openFullImage = async (imageData) => {
     setFullImage(imageData.imageUrl);
-    setImageFilename(extractImageNameFromUrl(imageData.imageUrl));
+    setImageFilename(imageData.imageFilename);
     setIsFullImageVisible(true);
 
 

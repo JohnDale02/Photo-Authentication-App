@@ -1,5 +1,4 @@
 import AWS from 'aws-sdk';
-import { CognitoUserPool, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
 
 //=============== AWS IDs ===============
 var userPoolId = 'us-east-2_jgICLJECT';
@@ -40,45 +39,57 @@ export const getCognitoIdentityCredentials = (idToken) => {
 };
 
 export const viewAlbum = (setImages, globalCameraNumber) => {
-    var bucketName = 'camera' + globalCameraNumber + 'verifiedimages';
+  var bucketName = 'camera' + globalCameraNumber + 'verifiedimages';
 
-    var s3 = new AWS.S3({
-      apiVersion: "2006-03-01",
-      params: { Bucket: bucketName }
-    });
-    
-    const endpoint = s3.endpoint.href; // Capture the endpoint outside the callback
+  var s3 = new AWS.S3({
+    apiVersion: "2006-03-01",
+    params: { Bucket: bucketName }
+  });
 
-    s3.listObjects({ Bucket: bucketName }, function(err, data) {
-      if (err) {
-          console.log("There was an error viewing your album: " + err.message);
-          return;
+  s3.listObjects({ Bucket: bucketName }, function(err, data) {
+    if (err) {
+        console.log("There was an error viewing your album: " + err.message);
+        return;
+    }
+
+    data.Contents.sort((a, b) => b.LastModified - a.LastModified);
+
+    var files = data.Contents.reduce((acc, file) => {
+      if (file.Key.endsWith('.png')) {
+        const jsonKey = file.Key.replace('.png', '.json');
+        acc.push({
+          pngKey: file.Key,
+          jsonKey: jsonKey
+        });
       }
-  
-      data.Contents.sort((a, b) => b.LastModified - a.LastModified);
-  
-      var files = data.Contents.reduce((acc, file) => {
-        if (file.Key.endsWith('.png')) {
-          const jsonKey = file.Key.replace('.png', '.json');
-          acc.push({
-            pngKey: file.Key,
-            jsonKey: jsonKey
-          });
-        }
-        return acc;
-      }, []);
-  
-       var bucketUrl = endpoint + bucketName + "/";
-  
-      var photos = files.map(({ pngKey, jsonKey }) => ({
-        imageUrl: bucketUrl + encodeURIComponent(pngKey),
-        jsonUrl: bucketUrl + encodeURIComponent(jsonKey),
-      }));
-  
-      console.log("Photos:" + photos);
-  
-      setImages(photos);
+      return acc;
+    }, []);
+
+    var photos = files.map(({ pngKey, jsonKey }) => {
+      // Generate signed URLs for each image and JSON file
+      const imageUrl = s3.getSignedUrl('getObject', {
+        Bucket: bucketName,
+        Key: pngKey,
+        Expires: 60 // This URL will be valid for 60 seconds
+      });
+
+      const jsonUrl = s3.getSignedUrl('getObject', {
+        Bucket: bucketName,
+        Key: jsonKey,
+        Expires: 60 // This URL will be valid for 60 seconds
+      });
+
+      return {
+        imageUrl: imageUrl,
+        jsonUrl: jsonUrl,
+        imageFilename: pngKey,
+      };
     });
+
+    console.log("Photos:", photos);
+
+    setImages(photos);
+  });
 };
 
 
