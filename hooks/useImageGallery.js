@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { viewAlbum } from '../cognito/config';
+import { setPhotosFromS3 } from '../cognito/config';
 
 const useImageGallery = (cameraNumber) => {
   const [images, setImages] = useState([]);
@@ -10,7 +10,7 @@ const useImageGallery = (cameraNumber) => {
 
     const fetchImages = () => {
       if (cameraNumber) {
-        viewAlbum(setImages, cameraNumber);
+        setPhotosFromS3(setImages, cameraNumber);
       }
     };
 

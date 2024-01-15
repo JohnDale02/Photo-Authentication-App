@@ -38,7 +38,7 @@ export const getCognitoIdentityCredentials = (idToken) => {
     });
 };
 
-export const viewAlbum = (setImages, globalCameraNumber) => {
+export const setPhotosFromS3 = (setImages, globalCameraNumber) => {
 
 // Assume `signedUrlCache` is a module-level variable that does not require state updates
   let signedUrlCache = {};

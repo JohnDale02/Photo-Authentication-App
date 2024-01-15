@@ -34,7 +34,6 @@ export default function Login() {
 
   const images = useImageGallery(userDetails?.cameraNumber);
 
-
   const openFullImage = async (imageData) => {
     setFullImage(imageData.imageUrl);
     setImageFilename(imageData.imageFilename);
