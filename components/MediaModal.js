@@ -15,7 +15,7 @@ const MediaModal = ({ isVisible, media, mediaJson, mediaFilename, isVideo, onClo
         {isVideo ? (
           <div className={imageStyles.videoWrapper}>
             <video controls>
-              <source src={media} type="video/webm" />
+              <source src={media} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           </div>

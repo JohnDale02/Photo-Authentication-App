@@ -84,12 +84,12 @@ export const setMediaFromS3 = (setMedia, globalCameraNumber) => {
     data.Contents.sort((a, b) => b.LastModified - a.LastModified);
 
     var mediaItems = data.Contents.reduce((acc, file) => {
-      if (file.Key.endsWith('.png') || file.Key.endsWith('.webm')) {
-        const jsonKey = file.Key.endsWith('.png') ? file.Key.replace('.png', '.json') : file.Key.replace('.webm', '.json');
+      if (file.Key.endsWith('.png') || file.Key.endsWith('.mp4')) {
+        const jsonKey = file.Key.endsWith('.png') ? file.Key.replace('.png', '.json') : file.Key.replace('.mp4', '.json');
         acc.push({
           mediaKey: file.Key,
           jsonKey: jsonKey,
-          isVideo: file.Key.endsWith('.webm') // Add isVideo property
+          isVideo: file.Key.endsWith('.mp4') // Add isVideo property
         });
       }
       return acc;
