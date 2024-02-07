@@ -38,7 +38,7 @@ export const getCognitoIdentityCredentials = (idToken) => {
     });
 };
 
-export const setPhotosFromS3 = (setImages, globalCameraNumber) => {
+export const setMediaFromS3 = (setMedia, globalCameraNumber) => {
 
 // Assume `signedUrlCache` is a module-level variable that does not require state updates
   let signedUrlCache = {};
@@ -83,32 +83,33 @@ export const setPhotosFromS3 = (setImages, globalCameraNumber) => {
 
     data.Contents.sort((a, b) => b.LastModified - a.LastModified);
 
-    var files = data.Contents.reduce((acc, file) => {
-      if (file.Key.endsWith('.png')) {
-        const jsonKey = file.Key.replace('.png', '.json');
+    var mediaItems = data.Contents.reduce((acc, file) => {
+      if (file.Key.endsWith('.png') || file.Key.endsWith('.webm')) {
+        const jsonKey = file.Key.endsWith('.png') ? file.Key.replace('.png', '.json') : file.Key.replace('.webm', '.json');
         acc.push({
-          pngKey: file.Key,
-          jsonKey: jsonKey
+          mediaKey: file.Key,
+          jsonKey: jsonKey,
+          isVideo: file.Key.endsWith('.webm') // Add isVideo property
         });
       }
       return acc;
     }, []);
 
-    var photos = files.map(({ pngKey, jsonKey }) => {
-      // Generate signed URLs for each image and JSON file
-      const imageUrl = getSignedUrl(s3, bucketName, pngKey );
+    var media = mediaItems.map(({ mediaKey, jsonKey, isVideo }) => {
+      const mediaUrl = getSignedUrl(s3, bucketName, mediaKey);
       const jsonUrl = getSignedUrl(s3, bucketName, jsonKey, true);
 
       return {
-        imageUrl: imageUrl,
+        mediaUrl: mediaUrl,
         jsonUrl: jsonUrl,
-        imageFilename: pngKey,
+        mediaFilename: mediaKey, 
+        isVideo: isVideo
       };
     });
 
-    console.log("Photos:", photos);
+    console.log("Media:", media);
 
-    setImages(photos);
+    setMedia(media);
   });
 };
 

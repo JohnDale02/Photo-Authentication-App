@@ -3,13 +3,13 @@ import Head from 'next/head';
 
 import LoginForm from '../components/LoginForm';
 import ImageGallery from '../components/ImageGallery';
-import ImageModal from '../components/ImageModal';
+import MediaModal from '../components/MediaModal';
 import Slider from '../components/Slider'; // Import the new component
 import SignatureModal from '../components/SignatureModal';
 import { downloadImageAndJson } from '../cognito/config'; // Adjust the path as needed
 
 import useAuthentication from '../hooks/useAuthentication';
-import useImageGallery from '../hooks/useImageGallery';
+import useMediaGallery from '../hooks/useMediaGallery';
 
 import styles from '../styles/login.module.css'; // Import as a module
 
@@ -24,35 +24,37 @@ export default function Login() {
     errorMessage
   } = useAuthentication();
 
-  const [fullImage, setFullImage] = useState(null);
-  const [fullImageJson, setFullImageJson] = useState(null);
-  const [imageFilename, setImageFilename] = useState('');
+  const [fullMedia, setFullMedia] = useState(null);
+  const [isVideo, setIsVideo] = useState(null);
+  const [fullMediaJson, setFullMediaJson] = useState(null);
+  const [mediaFilename, setMediaFilename] = useState('');
   const [isSignatureModalVisible, setIsSignatureModalVisible] = useState(false);
-  const [isFullImageVisible, setIsFullImageVisible] = useState(false);
+  const [isFullMediaVisible, setIsFullMediaVisible] = useState(false);
   const [loginError, setLoginError] = useState(""); // State to hold login error message
   const [numColumns, setNumColumns] = useState(3); // State for dynamic number of columns
 
-  const images = useImageGallery(userDetails?.cameraNumber);
+  const media = useMediaGallery(userDetails?.cameraNumber);
 
-  const openFullImage = async (imageData) => {
-    setFullImage(imageData.imageUrl);
-    setImageFilename(imageData.imageFilename);
-    setIsFullImageVisible(true);
+  const openFullMedia = async (mediaData) => {
+    setFullMedia(mediaData.mediaUrl);
+    setMediaFilename(mediaData.mediaFilename);
+    setIsVideo(mediaData.isVideo);
+    setIsFullMediaVisible(true);
 
 
     try {
-      const response = await fetch(imageData.jsonUrl);
+      const response = await fetch(mediaData.jsonUrl);
       const jsonData = await response.json();
-      setFullImageJson(jsonData);
+      setFullMediaJson(jsonData);
     } catch (error) {
       console.error("Error fetching JSON data:", error);
-      setFullImageJson(null);
+      setFullMediaJson(null);
     }
   };
 
-  const closeFullImage = () => {
-    setFullImage(null);
-    setIsFullImageVisible(false);
+  const closeFullMedia = () => {
+    setFullMedia(null);
+    setIsFullMediaVisible(false);
   };
 
   const openSignatureModal = () => {
@@ -64,9 +66,9 @@ export default function Login() {
   };
 
   const handleDownloadClick = () => {
-    const imageKey = imageFilename; 
+    const mediaKey = mediaFilename; 
     if (userDetails) {
-      downloadImageAndJson(imageKey, userDetails.idToken, userDetails.cameraNumber);
+      downloadImageAndJson(mediaKey, userDetails.idToken, userDetails.cameraNumber);
     }
   };
 
@@ -102,20 +104,21 @@ export default function Login() {
       ) : (
         <>
           <Slider numColumns={numColumns} setNumColumns={setNumColumns} /> 
-          <ImageGallery images={images} onImageSelect={openFullImage} numColumns={numColumns}/>
-          <ImageModal 
-            isVisible={isFullImageVisible} 
-            image={fullImage} 
-            imageJson={fullImageJson} 
-            imageFilename={imageFilename}
-            onClose={closeFullImage}
+          <ImageGallery media={media} onMediaSelect={openFullMedia} numColumns={numColumns}/>
+          <MediaModal 
+            isVisible={isFullMediaVisible} 
+            media={fullMedia} 
+            mediaJson={fullMediaJson} 
+            mediaFilename={mediaFilename}
+            isVideo={isVideo}
+            onClose={closeFullMedia}
             onDownloadClick={handleDownloadClick}
             openSignatureModal={openSignatureModal}
           />
-          {fullImageJson?.['Signature_Base64'] && (
+          {fullMediaJson?.['Signature_Base64'] && (
             <SignatureModal 
               isVisible={isSignatureModalVisible} 
-              signature={fullImageJson['Signature_Base64']} 
+              signature={fullMediaJson['Signature_Base64']} 
               onClose={closeSignatureModal} 
             />
           )}

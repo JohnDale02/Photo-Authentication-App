@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
-import { setPhotosFromS3 } from '../cognito/config';
+import { setMediaFromS3 } from '../cognito/config';
 
-const useImageGallery = (cameraNumber) => {
+const useMediaGallery = (cameraNumber) => {
   const [images, setImages] = useState([]);
-  const pollInterval = 3000; // Polling interval in milliseconds (e.g., 3000 for 3 seconds)
+  const pollInterval = 10000; // Polling interval in milliseconds (e.g., 3000 for 3 seconds)
+  //const pollInterval = 60000; // Polling interval in milliseconds (e.g., 3000 for 3 seconds)
 
   useEffect(() => {
     let intervalId;
 
     const fetchImages = () => {
       if (cameraNumber) {
-        setPhotosFromS3(setImages, cameraNumber);
+        setMediaFromS3(setImages, cameraNumber);
       }
     };
 
@@ -29,4 +30,4 @@ const useImageGallery = (cameraNumber) => {
   return images;
 };
 
-export default useImageGallery;
+export default useMediaGallery;

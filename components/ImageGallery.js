@@ -1,24 +1,29 @@
 import React from 'react';
 import imageStyles from '../styles/images.module.css';
 
-const ImageGallery = ({ images, onImageSelect, numColumns = 3 }) => {
-  console.log("Images in Gallery function: " + images); // Place this in `Login.js` and `ImageGallery.js`
-
+const MediaGallery = ({ media, onMediaSelect, numColumns = 3 }) => {
   return (
-    <div 
-      className={imageStyles.imgGallery}
-      style={{ '--num-columns': numColumns }}
-    >
-      {images.map((image, index) => (
-        <img
-          key={index}
-          src={image.imageUrl}
-          alt={`Image ${index}`}
-          onClick={() => onImageSelect(image)}
-        />
-      ))}
+    <div className={imageStyles.imgGallery} style={{ '--num-columns': numColumns }}>
+      {media.map((file, index) => {
+        return file.isVideo ? (
+          <video
+            key={index}
+            src={file.mediaUrl}
+            alt={`Media ${index}`}
+            className={imageStyles.mediaItem}
+            onClick={() => onMediaSelect(file)}
+          />
+        ) : (
+          <img
+            key={index}
+            src={file.mediaUrl}
+            alt={`Media ${index}`}
+            onClick={() => onMediaSelect(file)}
+          />
+        );
+      })}
     </div>
   );
 };
 
-export default ImageGallery;
+export default MediaGallery;

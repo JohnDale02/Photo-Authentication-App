@@ -1,22 +1,35 @@
 import React from 'react';
 import imageStyles from '../styles/images.module.css';
 
-const ImageModal = ({ isVisible, image, imageJson, imageFilename, onClose, onDownloadClick, openSignatureModal }) => {
+const MediaModal = ({ isVisible, media, mediaJson, mediaFilename, isVideo, onClose, onDownloadClick, openSignatureModal }) => {
   if (!isVisible) return null;
+
+  // Determine if the media is a video based on its file extension
+  console.log("Is this a video?:", isVideo); 
 
   return (
     <div className={`${imageStyles.fullImg} ${isVisible ? imageStyles.show : ''}`} id="fullImgBox">
       <div className={imageStyles.imageDetails}>
-        <h3>Image Details: {imageFilename || 'No Details'}</h3> {/* Adjust as per your data structure */}
-        <img src={image} alt="Full Size" />
+        <h3>Media Details: {mediaFilename || 'No Details'}</h3>
 
-        {imageJson && (
+        {isVideo ? (
+          <div className={imageStyles.videoWrapper}>
+            <video controls>
+              <source src={media} type="video/webm" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        ) : (
+          <img src={media} alt="Full Size"/>
+        )}
+
+        {mediaJson && (
           <div className={imageStyles.jsonContainer}>
-            {Object.keys(imageJson).map((key) => {
+            {Object.keys(mediaJson).map((key) => {
               if (key !== 'Signature_Base64') {
                 return (
                   <li key={key}>
-                    <strong>{key}:</strong> {imageJson[key]}
+                    <strong>{key}:</strong> {mediaJson[key]}
                   </li>
                 );
               } else {
@@ -27,18 +40,19 @@ const ImageModal = ({ isVisible, image, imageJson, imageFilename, onClose, onDow
             })}
           </div>
         )}
+
         <div className={imageStyles.buttonContainer}>
           <button onClick={onDownloadClick}>
-            Download Image and Metadata
+            Download Media and Metadata
           </button>
         </div>
+
         <div>
-        <span onClick={onClose}>X</span>
+          <span onClick={onClose}>X</span>
         </div>
       </div>
-     
     </div>
   );
 };
 
-export default ImageModal;
+export default MediaModal;
