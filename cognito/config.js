@@ -114,7 +114,7 @@ export const setMediaFromS3 = (setMedia, globalCameraNumber) => {
 };
 
 
-export const downloadImageAndJson = async (imageKey, idToken, globalCameraNumber) => {
+export const downloadMedia = async (mediaKey, isVideo, idToken, globalCameraNumber) => {
     const s3 = new AWS.S3({
       apiVersion: '2006-03-01',
       region: region,
@@ -137,23 +137,35 @@ export const downloadImageAndJson = async (imageKey, idToken, globalCameraNumber
       downloadLink.click();
       document.body.removeChild(downloadLink);
     };
-  
+
+    if (isVideo == true) {
+      mediaKey = mediaKey.replace('.mp4', '.avi');
+    }
+
     // Get signed URL and download the image
-    const imageParams = {
+    const mediaParams = {
       Bucket: bucketName,
-      Key: imageKey,
+      Key: mediaKey,
     };
   
-    s3.getSignedUrl('getObject', imageParams, (err, imageUrl) => {
+    s3.getSignedUrl('getObject',  mediaParams, (err, mediaUrl) => {
       if (err) {
         console.error('Error getting signed URL for image:', err);
         return;
       }
-      triggerDownload(imageUrl, imageKey);
+      triggerDownload(mediaUrl, mediaKey);
     });
   
-    // Get signed URL and download the JSON
-    const jsonKey = imageKey.replace('.png', '.json');
+    let extension;
+    if (isVideo == true) {
+      extension = '.avi';
+    }
+    else {
+      extension = '.png';
+    }
+
+    const jsonKey = mediaKey.replace(extension, '.json');
+
     const jsonParams = {
       Bucket: bucketName,
       Key: jsonKey,
@@ -170,4 +182,51 @@ export const downloadImageAndJson = async (imageKey, idToken, globalCameraNumber
   
     }, 3000);
     
+  };
+
+
+  export const deleteMedia = async (mediaKey, isVideo, idToken, globalCameraNumber) => {
+    const s3 = new AWS.S3({
+      apiVersion: '2006-03-01',
+      region: region,
+      credentials: new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: identityPoolId,
+        Logins: {
+          [`cognito-idp.${region}.amazonaws.com/${userPoolId}`]: idToken,
+        },
+      }),
+    });
+  
+    const bucketName = 'camera' + globalCameraNumber + "verifiedimages";
+  
+    // Parameters for deleting the media object
+
+    const deleteFile = async (mediaKey) => {
+      const mediaParams = {
+        Bucket: bucketName,
+        Key: mediaKey,
+      };
+      try {
+        const deleteResponse = await s3.deleteObject(mediaParams).promise();
+        console.log(`Successfully deleted file: ${mediaKey}`, deleteResponse);
+      } catch (err) {
+        console.error(`Error deleting file: ${mediaKey}`, err);
+        throw err; // Rethrow the error to handle it in the calling function
+      }
+    };
+  
+    // Determine the media extension
+    const mediaExtension = isVideo ? '.mp4' : '.png'; // Adjust the extension if necessary
+    // Replace the extension with '.json' to get the key for the JSON file
+    const jsonKey = mediaKey.replace(mediaExtension, '.json');
+  
+    // Delete the media file
+    await deleteFile(mediaKey);
+
+    if (isVideo) { 
+      mediaKey = mediaKey.replace('.mp4', '.avi');
+      await deleteFile(mediaKey);
+    }
+
+    await deleteFile(jsonKey);
   };

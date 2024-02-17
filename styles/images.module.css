@@ -52,11 +52,10 @@
 }
 
 .imageDetails img, .imageDetails video{
-    display: block;
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-    margin-bottom: 20px;
+    max-width: 70vh; /* This will limit the height of the image/video */
+    width: 100%; /* This will make the image/video responsive */
+    object-fit: contain; /* Keeps aspect ratio intact */
+    margin: auto; /* Centers the image/video within the container */
 }
 
 .imageDetails h3 {
@@ -114,19 +113,21 @@
 
 .buttonContainer {
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
     width: 100%;
+    margin: auto;
     margin-top: 20px;
 }
 
 .buttonContainer button {
     width: 80%;
     padding: 10px 20px;
-    margin: 0; /* Removes any default margin */
+    margin-left: 2%; /* Removes any default margin */
+    margin-right: 2%; /* Removes any default margin */
     background-color: #3498db;
     color: white;
-    border-radius: 20px;
+    border-radius: 10px;
     font-size: 20px; /* Adjust font-size as needed */
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -135,6 +136,10 @@
 
 .buttonContainer button:hover {
     background-color: #2980b9;
+}
+
+.buttonContainer button.deleteButton:hover{
+    background-color: #e74c3c;
 }
 
 .sliderContainer {
@@ -185,6 +190,11 @@
   .sliderContainer input[type="range"]:hover,
   .sliderContainer input[type="range"]:focus {
     opacity: 1; /* Full opacity on hover/focus */
+  }
+
+.mediaItemWrapper {
+    position: relative;
+    /* Add other styles as necessary */
   }
 
 .loader {

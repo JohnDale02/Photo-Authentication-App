@@ -1,7 +1,7 @@
 import React from 'react';
 import imageStyles from '../styles/images.module.css';
 
-const MediaModal = ({ isVisible, media, mediaJson, mediaFilename, isVideo, onClose, onDownloadClick, openSignatureModal }) => {
+const MediaModal = ({ isVisible, media, mediaJson, mediaFilename, isVideo, onClose, onDownloadClick, onDeleteClick, openSignatureModal }) => {
   if (!isVisible) return null;
 
   // Determine if the media is a video based on its file extension
@@ -10,7 +10,7 @@ const MediaModal = ({ isVisible, media, mediaJson, mediaFilename, isVideo, onClo
   return (
     <div className={`${imageStyles.fullImg} ${isVisible ? imageStyles.show : ''}`} id="fullImgBox">
       <div className={imageStyles.imageDetails}>
-        <h3>Media Details: {mediaFilename || 'No Details'}</h3>
+        <h3>{mediaFilename || 'Filename Unknown'}</h3>
 
         {isVideo ? (
           <div className={imageStyles.videoWrapper}>
@@ -26,13 +26,13 @@ const MediaModal = ({ isVisible, media, mediaJson, mediaFilename, isVideo, onClo
         {mediaJson && (
           <div className={imageStyles.jsonContainer}>
             {Object.keys(mediaJson).map((key) => {
-              if (key !== 'Signature_Base64') {
+              if (key !== 'Signature_Base64' && key !== 'Camera Number') {
                 return (
                   <li key={key}>
                     <strong>{key}:</strong> {mediaJson[key]}
                   </li>
                 );
-              } else {
+              } if (key === 'Signature_Base64') {
                 return (
                   <button onClick={openSignatureModal} key={key}>View Signature</button>
                 );
@@ -42,9 +42,12 @@ const MediaModal = ({ isVisible, media, mediaJson, mediaFilename, isVideo, onClo
         )}
 
         <div className={imageStyles.buttonContainer}>
-          <button onClick={onDownloadClick}>
-            Download Media and Metadata
-          </button>
+        <button onClick={onDownloadClick}>
+          Download
+        </button>
+        <button className={imageStyles.deleteButton} onClick={onDeleteClick}> {/* Change the onClick event to the delete function */}
+          Delete
+        </button>
         </div>
 
         <div>

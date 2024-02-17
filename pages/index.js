@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 
 import LoginForm from '../components/LoginForm';
-import ImageGallery from '../components/ImageGallery';
+import ImageGallery from '../components/MediaGallery';
 import MediaModal from '../components/MediaModal';
 import Slider from '../components/Slider'; // Import the new component
 import SignatureModal from '../components/SignatureModal';
-import { downloadImageAndJson } from '../cognito/config'; // Adjust the path as needed
+import { downloadMedia, deleteMedia } from '../cognito/config'; // Adjust the path as needed
 
 import useAuthentication from '../hooks/useAuthentication';
 import useMediaGallery from '../hooks/useMediaGallery';
@@ -33,7 +33,7 @@ export default function Login() {
   const [loginError, setLoginError] = useState(""); // State to hold login error message
   const [numColumns, setNumColumns] = useState(3); // State for dynamic number of columns
 
-  const media = useMediaGallery(userDetails?.cameraNumber);
+  const [media, fetchImages] = useMediaGallery(userDetails?.cameraNumber);
 
   const openFullMedia = async (mediaData) => {
     setFullMedia(mediaData.mediaUrl);
@@ -67,10 +67,23 @@ export default function Login() {
 
   const handleDownloadClick = () => {
     const mediaKey = mediaFilename; 
+
     if (userDetails) {
-      downloadImageAndJson(mediaKey, userDetails.idToken, userDetails.cameraNumber);
+      downloadMedia(mediaKey, isVideo, userDetails.idToken, userDetails.cameraNumber);
     }
   };
+
+  const handleDeleteClick = async () => {
+    const mediaKey = mediaFilename; 
+
+    if (userDetails) {
+      await deleteMedia(mediaKey, isVideo, userDetails.idToken, userDetails.cameraNumber);
+      closeFullMedia();
+      fetchImages(); // Force re-fetch of the images
+    }
+    
+  };
+
 
   const onLoginSuccess = ({ email, password, idToken, cameraNumber  }) => {
     login({ email, password, idToken, cameraNumber  });
@@ -113,6 +126,7 @@ export default function Login() {
             isVideo={isVideo}
             onClose={closeFullMedia}
             onDownloadClick={handleDownloadClick}
+            onDeleteClick={handleDeleteClick}
             openSignatureModal={openSignatureModal}
           />
           {fullMediaJson?.['Signature_Base64'] && (

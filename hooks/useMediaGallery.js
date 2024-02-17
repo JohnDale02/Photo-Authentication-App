@@ -1,33 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { setMediaFromS3 } from '../cognito/config';
 
 const useMediaGallery = (cameraNumber) => {
   const [images, setImages] = useState([]);
-  const pollInterval = 10000; // Polling interval in milliseconds (e.g., 3000 for 3 seconds)
+  const pollInterval = 20000; // Polling interval in milliseconds (e.g., 3000 for 3 seconds)
   //const pollInterval = 60000; // Polling interval in milliseconds (e.g., 3000 for 3 seconds)
 
-  useEffect(() => {
-    let intervalId;
-
-    const fetchImages = () => {
-      if (cameraNumber) {
-        setMediaFromS3(setImages, cameraNumber);
-      }
-    };
-
+  const fetchImages = useCallback(() => {
     if (cameraNumber) {
-      fetchImages(); // Initial fetch
-      intervalId = setInterval(fetchImages, pollInterval); // Start polling
+      setMediaFromS3(setImages, cameraNumber);
     }
+  }, [cameraNumber]);
 
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId); // Clear interval on unmount
-      }
-    };
-  }, [cameraNumber, pollInterval]);
+  useEffect(() => {
+    fetchImages(); // Initial fetch
+    const intervalId = setInterval(fetchImages, pollInterval); // Start polling
 
-  return images;
+    return () => clearInterval(intervalId); // Clear interval on unmount
+  }, [fetchImages, pollInterval]);
+
+  return [images, fetchImages]; // Return the fetch function so it can be called externally
 };
 
 export default useMediaGallery;
