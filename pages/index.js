@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 
 import LoginForm from '../components/LoginForm';
-import ImageGallery from '../components/MediaGallery';
+import MediaGallery from '../components/MediaGallery';
 import MediaModal from '../components/MediaModal';
 import Slider from '../components/Slider'; // Import the new component
 import SignatureModal from '../components/SignatureModal';
@@ -117,7 +117,7 @@ export default function Login() {
       ) : (
         <>
           <Slider numColumns={numColumns} setNumColumns={setNumColumns} /> 
-          <ImageGallery media={media} onMediaSelect={openFullMedia} numColumns={numColumns}/>
+          <MediaGallery media={media} onMediaSelect={openFullMedia} numColumns={numColumns}/>
           <MediaModal 
             isVisible={isFullMediaVisible} 
             media={fullMedia} 

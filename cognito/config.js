@@ -39,7 +39,6 @@ export const getCognitoIdentityCredentials = (idToken) => {
 };
 
 export const setMediaFromS3 = (setMedia, globalCameraNumber) => {
-
 // Assume `signedUrlCache` is a module-level variable that does not require state updates
   let signedUrlCache = {};
 
