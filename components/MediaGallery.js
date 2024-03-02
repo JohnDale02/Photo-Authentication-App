@@ -6,16 +6,18 @@ const MediaGallery = ({ media, onMediaSelect, numColumns = 3 }) => {
     <div className={imageStyles.imgGallery} style={{ '--num-columns': numColumns }}>
       {media.map((file, index) => {
         return file.isVideo ? (
-          <video
-            key={index}
-            src={file.mediaUrl}
-            alt={`Media ${index}`}
-            className={imageStyles.mediaItem}
-            onClick={() => onMediaSelect(file)}
-          />
+          <div className={imageStyles.playButton}>
+            <video
+              key={file.mediaFilename}  
+              src={file.mediaUrl}
+              alt={`Media ${index}`}
+              className={imageStyles.mediaItem}
+              onClick={() => onMediaSelect(file)}
+            />
+          </div>
         ) : (
           <img
-            key={index}
+            key={file.mediaFilename}
             src={file.mediaUrl}
             alt={`Media ${index}`}
             onClick={() => onMediaSelect(file)}
