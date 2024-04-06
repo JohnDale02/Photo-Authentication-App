@@ -10,8 +10,10 @@
 /* Adjust the individual image sizes */
 .imgGallery img {
     width: 100%;
+    height: 100%;
     cursor: pointer;
     transition: transform 0.15s ease-in-out;
+    border-radius: 5px;
 }
 
 .imgGallery img:hover {
