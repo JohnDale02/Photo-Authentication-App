@@ -39,12 +39,12 @@ const LoginForm = ({ onLoginSuccess, onLoginFailure }) => {
             onLoginFailure(err.message);
           } else {
             // Find the camera number attribute
-            const cameraNumberAttribute = attributes.find(attr => attr.getName() === 'custom:camera_number');
-            const cameraNumber = cameraNumberAttribute ? cameraNumberAttribute.getValue() : null;
+            const bucketNameAttribute = attributes.find(attr => attr.getName() === 'custom:fingerprint');
+            const bucketName_fingerprint = bucketNameAttribute ? bucketNameAttribute.getValue() : null;
     
-            // Pass idToken, email, and cameraNumber to the parent component
-            console.log("Got cameranumber from Login Form", cameraNumber);
-            onLoginSuccess({ email, password, idToken, cameraNumber });
+            // Pass idToken, email, and bucketName fingerprint to the parent component
+            console.log("Got bucketName_fingerprint from Login Form", bucketName_fingerprint);
+            onLoginSuccess({ email, password, idToken, bucketName_fingerprint });
           }
         });
       },

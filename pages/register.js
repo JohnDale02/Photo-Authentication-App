@@ -8,16 +8,16 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 
 //=============== AWS IDs ===============
-var userPoolId = 'us-east-2_jgICLJECT';
-var clientId = '4uda3lbttf8o7t7iu1jap3dr1h';
+var userPoolId = 'us-east-2_0cV1pXRAu';
+var clientId = '7uck4ke8tv6tmlbgnktlcd521v';
 var region = 'us-east-2';
-var identityPoolId = 'us-east-2:27d074d6-1504-4bbf-8394-45f8a4595b87';
+var identityPoolId = 'us-east-2:d1807790-6713-47b5-8e18-f45270fd9686';
 //=============== AWS IDs ===============
 
 var cognitoUser;
 var idToken;
 var userPool;
-var globalCameraNumber = null;
+var globalBucketName = null;
 
 var poolData = { 
     UserPoolId : userPoolId,
@@ -47,12 +47,12 @@ function getCurrentLoggedInSession(){
                     if (err) {
                         console.log(err.message);
                     } else{
-                        let cameraNumber = attributes.find(attr => attr.getName() === 'username');
-                        if (cameraNumber){
-                            globalCameraNumber = cameraNumber.getValue(); // Store camera number globally
-                            console.log('Camera Number: ' + cameraNumber.getValue());
+                        let bucketName = attributes.find(attr => attr.getName() === 'username');
+                        if (bucketName){
+                            globalBucketName = bucketName.getValue(); // Store camera number globally
+                            console.log('Fingerprint: ' + bucketName.getValue());
                         } else {
-                            console.log('Camera Number not set.');
+                            console.log('Fingerprint not set.');
                         }
                     }
                 });
@@ -95,7 +95,7 @@ export default function Register() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [cameraNumber, setCameraNumber] = useState('');
+    const [bucketName, setBucketName] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [verificationCode, setVerificationCode] = useState('');
 
@@ -122,15 +122,15 @@ export default function Register() {
         var attributeEmail = new CognitoUserAttribute(dataEmail);
         attributeList.push(attributeEmail);
 
-        var dataCameraNumber = {
-            Name: 'custom:camera_number',
-            Value: cameraNumber
+        var dataBucketName = {
+            Name: 'custom:fingerprint',
+            Value: bucketName
         };
 
-        var attributeCameraNumber = new CognitoUserAttribute(dataCameraNumber);
-        attributeList.push(dataCameraNumber);
+        var attributeBucketName = new CognitoUserAttribute(dataBucketName);
+        attributeList.push(attributeBucketName);
 
-        userPool.signUp(cameraNumber, password, attributeList, null, function(err, result) {
+        userPool.signUp(bucketName, password, attributeList, null, function(err, result) {
             if (err) {
                 setErrorMessage("Unable to sign up with those credentials");
                 return;
@@ -179,11 +179,10 @@ export default function Register() {
           </div>
 
           <div className={styles.inputBox}>
-            <input type="cameraNumber" placeholder="Enter Camera Number" required 
-                onChange={(e) => setCameraNumber(e.target.value)}/>
+            <input type="text" placeholder="Enter Bucket Name" required 
+                onChange={(e) => setBucketName(e.target.value)}/>
             <i className='bx bx-code-alt'></i>
           </div>
-
 
           <div className={styles.inputBox}>
             <input type="password" placeholder="Password" required 

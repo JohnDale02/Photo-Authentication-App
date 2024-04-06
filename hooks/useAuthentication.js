@@ -7,7 +7,7 @@ const useAuthentication = () => {
   const [userDetails, setUserDetails] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const login = async ({ email, password, idToken, cameraNumber }) => {
+  const login = async ({ email, password, idToken, bucketName_fingerprint }) => {
     try {
       const userPool = new CognitoUserPool(poolData);
       const authenticationData = { Username: email, Password: password };
@@ -19,7 +19,7 @@ const useAuthentication = () => {
         onSuccess: function (result) {
           getCognitoIdentityCredentials(idToken);
           setIsLoggedIn(true);
-          setUserDetails({ email, idToken, cameraNumber }); // You can add more user details here
+          setUserDetails({ email, idToken, bucketName_fingerprint }); // You can add more user details here
         },
         onFailure: function (err) {
           setErrorMessage(err.message || 'Login failed');

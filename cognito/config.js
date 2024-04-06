@@ -1,10 +1,10 @@
 import AWS from 'aws-sdk';
 
 //=============== AWS IDs ===============
-var userPoolId = 'us-east-2_jgICLJECT';
-var clientId = '4uda3lbttf8o7t7iu1jap3dr1h';
+var userPoolId = 'us-east-2_0cV1pXRAu';
+var clientId = '7uck4ke8tv6tmlbgnktlcd521v';
 var region = 'us-east-2';
-var identityPoolId = 'us-east-2:27d074d6-1504-4bbf-8394-45f8a4595b87';
+var identityPoolId = 'us-east-2:d1807790-6713-47b5-8e18-f45270fd9686';
 
 
 export const poolData = { 
@@ -38,7 +38,7 @@ export const getCognitoIdentityCredentials = (idToken) => {
     });
 };
 
-export const setMediaFromS3 = (setMedia, globalCameraNumber) => {
+export const setMediaFromS3 = (setMedia, bucketName_fingerprint) => {
 // Assume `signedUrlCache` is a module-level variable that does not require state updates
   let signedUrlCache = {};
 
@@ -67,7 +67,7 @@ export const setMediaFromS3 = (setMedia, globalCameraNumber) => {
     }
   };
 
-  var bucketName = 'camera' + globalCameraNumber + 'verifiedimages';
+  var bucketName = bucketName_fingerprint;
 
   var s3 = new AWS.S3({
     apiVersion: "2006-03-01",
@@ -113,7 +113,7 @@ export const setMediaFromS3 = (setMedia, globalCameraNumber) => {
 };
 
 
-export const downloadMedia = async (mediaKey, isVideo, idToken, globalCameraNumber) => {
+export const downloadMedia = async (mediaKey, isVideo, idToken, bucketName_fingerprint) => {
     const s3 = new AWS.S3({
       apiVersion: '2006-03-01',
       region: region,
@@ -125,7 +125,7 @@ export const downloadMedia = async (mediaKey, isVideo, idToken, globalCameraNumb
       }),
     });
   
-    const bucketName = 'camera' + globalCameraNumber + "verifiedimages";
+    const bucketName = bucketName_fingerprint;
   
     // Helper function to create and trigger a download link
     const triggerDownload = (url, filename) => {
@@ -184,7 +184,7 @@ export const downloadMedia = async (mediaKey, isVideo, idToken, globalCameraNumb
   };
 
 
-  export const deleteMedia = async (mediaKey, isVideo, idToken, globalCameraNumber) => {
+  export const deleteMedia = async (mediaKey, isVideo, idToken, bucketName_fingerprint) => {
     const s3 = new AWS.S3({
       apiVersion: '2006-03-01',
       region: region,
@@ -196,7 +196,7 @@ export const downloadMedia = async (mediaKey, isVideo, idToken, globalCameraNumb
       }),
     });
   
-    const bucketName = 'camera' + globalCameraNumber + "verifiedimages";
+    const bucketName = bucketName_fingerprint;
   
     // Parameters for deleting the media object
 

@@ -33,7 +33,7 @@ export default function Login() {
   const [loginError, setLoginError] = useState(""); // State to hold login error message
   const [numColumns, setNumColumns] = useState(3); // State for dynamic number of columns
 
-  const [media, fetchImages] = useMediaGallery(userDetails?.cameraNumber);
+  const [media, fetchImages] = useMediaGallery(userDetails?.bucketName_fingerprint);
 
   const openFullMedia = async (mediaData) => {
     setFullMedia(mediaData.mediaUrl);
@@ -69,7 +69,7 @@ export default function Login() {
     const mediaKey = mediaFilename; 
 
     if (userDetails) {
-      downloadMedia(mediaKey, isVideo, userDetails.idToken, userDetails.cameraNumber);
+      downloadMedia(mediaKey, isVideo, userDetails.idToken, userDetails.bucketName_fingerprint);
     }
   };
 
@@ -77,7 +77,7 @@ export default function Login() {
     const mediaKey = mediaFilename; 
 
     if (userDetails) {
-      await deleteMedia(mediaKey, isVideo, userDetails.idToken, userDetails.cameraNumber);
+      await deleteMedia(mediaKey, isVideo, userDetails.idToken, userDetails.bucketName_fingerprint);
       closeFullMedia();
       fetchImages(); // Force re-fetch of the images
     }
@@ -85,8 +85,8 @@ export default function Login() {
   };
 
 
-  const onLoginSuccess = ({ email, password, idToken, cameraNumber  }) => {
-    login({ email, password, idToken, cameraNumber  });
+  const onLoginSuccess = ({ email, password, idToken, bucketName_fingerprint  }) => {
+    login({ email, password, idToken, bucketName_fingerprint  });
     console.log("Login Success I think");
     setLoginError(''); // Clear any existing errors
 
