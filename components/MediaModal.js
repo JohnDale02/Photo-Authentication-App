@@ -26,7 +26,7 @@ const MediaModal = ({ isVisible, media, mediaJson, mediaFilename, isVideo, onClo
         {mediaJson && (
           <div className={imageStyles.jsonContainer}>
             {Object.keys(mediaJson).map((key) => {
-              if (key !== 'Signature_Base64' && key !== 'Camera Number') {
+              if (key !== 'Signature_Base64') {
                 return (
                   <li key={key}>
                     <strong>{key}:</strong> {mediaJson[key]}
