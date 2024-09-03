@@ -2,13 +2,5 @@ This repository contains a Next.js application for visualizing photos stored in 
 
 This app is a visual proof-of-concept with limited functionality. As part of my UMass Senior Design project, with the goal of authenticating photos using digital signatures. This app pairs with our hardware proof-of-concept, PhotoLock. 
 
-Known Issues / Functionality Limitations:
-- Multiple users can sign up with the same email
-- Multiple users can sign up with the same camera number
-- Camera numbers are not a secure way to associate cameras with users
-- Forgot password route is not setup
-- "Remember me" checkbox not setup
-
-To-Do:
-- Add slider for increased or decreased number of images being viewed at once
-- sorting of images based on date taken
+## See the PhotoLock main repo here:
+https://github.com/JohnDale02/PhotoLock
